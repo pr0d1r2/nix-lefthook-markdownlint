@@ -1,0 +1,12 @@
+---
+pre-commit:
+  commands:
+    markdownlint:
+      glob: "*.md"
+      run: timeout ${LEFTHOOK_MARKDOWNLINT_TIMEOUT:-30} lefthook-markdownlint {staged_files}
+
+pre-push:
+  commands:
+    markdownlint:
+      glob: "*.md"
+      run: timeout ${LEFTHOOK_MARKDOWNLINT_TIMEOUT:-30} lefthook-markdownlint {push_files}
