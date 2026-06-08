@@ -57,3 +57,42 @@ MDEOF
     run lefthook-markdownlint "$TEST_TEMP/good.md" "$TEST_TEMP/file.txt"
     assert_success
 }
+
+@test "LEFTHOOK_MARKDOWNLINT_CONFIG applies a custom config" {
+    # Config disabling all rules -> otherwise-invalid markdown passes,
+    # proving the config file is honored.
+    cat > "$TEST_TEMP/relaxed.yml" << 'CFGEOF'
+default: false
+CFGEOF
+    cat > "$TEST_TEMP/bad.md" << 'MDEOF'
+# Hello
+# Hello
+MDEOF
+    LEFTHOOK_MARKDOWNLINT_CONFIG="$TEST_TEMP/relaxed.yml" \
+        run lefthook-markdownlint "$TEST_TEMP/bad.md"
+    assert_success
+}
+
+@test "LEFTHOOK_MARKDOWNLINT_CONFIG from outside the repo root" {
+    # The config need not be a committed root file (e.g. a nix out-link).
+    mkdir -p "$TEST_TEMP/out/link"
+    cat > "$TEST_TEMP/out/link/.markdownlint.yml" << 'CFGEOF'
+default: false
+CFGEOF
+    cat > "$TEST_TEMP/bad.md" << 'MDEOF'
+# Hello
+# Hello
+MDEOF
+    LEFTHOOK_MARKDOWNLINT_CONFIG="$TEST_TEMP/out/link/.markdownlint.yml" \
+        run lefthook-markdownlint "$TEST_TEMP/bad.md"
+    assert_success
+}
+
+@test "unset LEFTHOOK_MARKDOWNLINT_CONFIG still flags invalid markdown" {
+    cat > "$TEST_TEMP/bad.md" << 'MDEOF'
+# Hello
+# Hello
+MDEOF
+    run lefthook-markdownlint "$TEST_TEMP/bad.md"
+    assert_failure
+}
