@@ -18,4 +18,13 @@ if [ ${#files[@]} -eq 0 ]; then
   exit 0
 fi
 
-exec markdownlint "${files[@]}"
+# Optional config path. Unset -> markdownlint auto-discovers (.markdownlint.*
+# walking up from cwd), preserving prior behavior. Set -> use the given file,
+# which may live outside the repo root (e.g. a nix out-link), so the config
+# need not be a committed root file.
+config_args=()
+if [ -n "${LEFTHOOK_MARKDOWNLINT_CONFIG:-}" ]; then
+  config_args=(--config "$LEFTHOOK_MARKDOWNLINT_CONFIG")
+fi
+
+exec markdownlint "${config_args[@]}" "${files[@]}"
