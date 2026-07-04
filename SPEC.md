@@ -99,3 +99,5 @@ remotes:
 6. **`dev.sh` pre-commit hook existence check is fragile** — The guard `[ -f .git/hooks/pre-commit ]` only checks for the pre-commit hook file. If lefthook is partially installed (e.g. pre-push exists but pre-commit was deleted), the install re-runs but may not detect the partial state. Additionally, this check fails in worktrees where `.git` is a file, not a directory.
 
 7. **SPEC.md tables fail MD060 and file-size-check in CI (2026-07-04)** — Tables used unaligned pipe style (`|---|---|---|`) which violates MD060/table-column-style (markdownlint-cli 0.46). Additionally, SPEC.md at 7011 bytes exceeded the default 4096-byte file-size-check limit since no `.md` extension limit was configured. Fixed by aligning all tables and adding `md: 10240` to `config/lefthook/file_size_limits.yml`.
+
+8. **shfmt case-pattern indentation in lefthook-markdownlint.sh (2026-07-04)** — The `case` pattern body (`*.md)`) used 4-space indent instead of the 2-space indent that `shfmt` expects (case patterns at same level as `case`/`esac`). Fixed by reducing the indent from 4 to 2 spaces.

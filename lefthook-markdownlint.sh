@@ -10,7 +10,7 @@ files=()
 for f in "$@"; do
   [ -f "$f" ] || continue
   case "$f" in
-    *.md) files+=("$f") ;;
+  *.md) files+=("$f") ;;
   esac
 done
 
