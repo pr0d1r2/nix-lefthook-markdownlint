@@ -27,36 +27,36 @@ A Nix flake that packages a lefthook-compatible markdownlint wrapper (`lefthook-
 
 ### CLI
 
-| Command | Synopsis | Description |
-|---|---|---|
+| Command                 | Synopsis                           | Description                                                                         |
+| ----------------------- | ---------------------------------- | ----------------------------------------------------------------------------------- |
 | `lefthook-markdownlint` | `lefthook-markdownlint [file ...]` | Filter `.md` files from args, run `markdownlint` on them. Exit 0 if no files match. |
 
 ### Environment variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `LEFTHOOK_MARKDOWNLINT_TIMEOUT` | `30` | Timeout in seconds for the markdownlint lefthook command. |
-| `LEFTHOOK_MARKDOWNLINT_CONFIG` | _(unset)_ | Path to a markdownlint config file. When unset, markdownlint auto-discovers `.markdownlint.*`. |
-| `BATS_LIB_PATH` | _(set by dev shell)_ | Path to bats helper libraries; injected by `dev.sh` via `@BATS_LIB_PATH@` placeholder. |
+| Variable                        | Default              | Description                                                                                    |
+| ------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------- |
+| `LEFTHOOK_MARKDOWNLINT_TIMEOUT` | `30`                 | Timeout in seconds for the markdownlint lefthook command.                                      |
+| `LEFTHOOK_MARKDOWNLINT_CONFIG`  | _(unset)_            | Path to a markdownlint config file. When unset, markdownlint auto-discovers `.markdownlint.*`. |
+| `BATS_LIB_PATH`                 | _(set by dev shell)_ | Path to bats helper libraries; injected by `dev.sh` via `@BATS_LIB_PATH@` placeholder.         |
 
 ### Nix flake outputs
 
-| Output | Description |
-|---|---|
-| `packages.<system>.default` | `writeShellApplication` wrapping `lefthook-markdownlint.sh` with `markdownlint-cli` on `PATH`. |
+| Output                       | Description                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `packages.<system>.default`  | `writeShellApplication` wrapping `lefthook-markdownlint.sh` with `markdownlint-cli` on `PATH`.                |
 | `devShells.<system>.default` | Development shell with all tools: bats (with libs), lefthook, linter wrappers, coreutils, git, nix, parallel. |
-| `devShells.<system>.ci` | Alias for `default`; used by CI. |
+| `devShells.<system>.ci`      | Alias for `default`; used by CI.                                                                              |
 
 ### Config files
 
-| File | Format | Purpose |
-|---|---|---|
-| `lefthook.yml` | YAML | Full lefthook config with remotes and local markdownlint commands. |
-| `lefthook-remote.yml` | YAML | Minimal config consumed by other repos via lefthook remote. |
-| `.markdownlint.yml` | YAML | Markdownlint rules: MD013 (line length) and MD024 (duplicate headings) disabled. |
-| `.yamllint.yml` | YAML | Yamllint rules: default set, truthy key check off, line-length disabled. |
-| `.editorconfig` | INI | UTF-8, LF endings, 2-space indent, trim trailing whitespace, final newline. |
-| `config/lefthook/file_size_limits.yml` | YAML | Per-extension file size limits for the file-size-check lefthook command. |
+| File                                   | Format | Purpose                                                                          |
+| -------------------------------------- | ------ | -------------------------------------------------------------------------------- |
+| `lefthook.yml`                         | YAML   | Full lefthook config with remotes and local markdownlint commands.               |
+| `lefthook-remote.yml`                  | YAML   | Minimal config consumed by other repos via lefthook remote.                      |
+| `.markdownlint.yml`                    | YAML   | Markdownlint rules: MD013 (line length) and MD024 (duplicate headings) disabled. |
+| `.yamllint.yml`                        | YAML   | Yamllint rules: default set, truthy key check off, line-length disabled.         |
+| `.editorconfig`                        | INI    | UTF-8, LF endings, 2-space indent, trim trailing whitespace, final newline.      |
+| `config/lefthook/file_size_limits.yml` | YAML   | Per-extension file size limits for the file-size-check lefthook command.         |
 
 ### Lefthook remote integration
 
@@ -72,17 +72,17 @@ remotes:
 
 ## §T — Tasks
 
-| status | id | goal |
-|---|---|---|
-| `.` | T1 | Add `watch_file` entries to `.envrc` for `flake.nix`, `dev.sh`, and nix modules per direnv/modularity skills |
-| `.` | T2 | Add `nix/direnv.sh` extraction and wire it into `.envrc` to satisfy the nix/modularity skill pattern |
-| `.` | T3 | Add bats test for timeout behavior (verify the wrapper respects `LEFTHOOK_MARKDOWNLINT_TIMEOUT`) |
-| `.` | T4 | Add bats test covering symlink edge case (`.md` symlink pointing to valid/invalid file) |
-| `.` | T5 | Align `actions/checkout` version in `update-pins.yml` (v4) with `ci.yml` (v6) |
-| `.` | T6 | Extract the inline `SCANNER=` shell fragment in the `lefthook-nix-no-embedded-shell` wrapper to a separate script |
-| `.` | T7 | Add a bats test for `lefthook-remote.yml` validating its YAML structure and required keys |
-| `.` | T8 | Add `flake.lock` tracking rationale to README (currently gitignored; `nixpkgs-lock` pin provides reproducibility) |
-| `.` | T9 | Add `markdownlint` glob to the `lefthook-remote.yml` `pre-push` section to cover `{push_files}` consistently |
+| status | id  | goal                                                                                                              |
+| ------ | --- | ----------------------------------------------------------------------------------------------------------------- |
+| `.`    | T1  | Add `watch_file` entries to `.envrc` for `flake.nix`, `dev.sh`, and nix modules per direnv/modularity skills      |
+| `.`    | T2  | Add `nix/direnv.sh` extraction and wire it into `.envrc` to satisfy the nix/modularity skill pattern              |
+| `.`    | T3  | Add bats test for timeout behavior (verify the wrapper respects `LEFTHOOK_MARKDOWNLINT_TIMEOUT`)                  |
+| `.`    | T4  | Add bats test covering symlink edge case (`.md` symlink pointing to valid/invalid file)                           |
+| `.`    | T5  | Align `actions/checkout` version in `update-pins.yml` (v4) with `ci.yml` (v6)                                     |
+| `.`    | T6  | Extract the inline `SCANNER=` shell fragment in the `lefthook-nix-no-embedded-shell` wrapper to a separate script |
+| `.`    | T7  | Add a bats test for `lefthook-remote.yml` validating its YAML structure and required keys                         |
+| `.`    | T8  | Add `flake.lock` tracking rationale to README (currently gitignored; `nixpkgs-lock` pin provides reproducibility) |
+| `.`    | T9  | Add `markdownlint` glob to the `lefthook-remote.yml` `pre-push` section to cover `{push_files}` consistently      |
 
 ## §B — Bugs / Known Issues
 
@@ -97,3 +97,5 @@ remotes:
 5. **`flake.lock` is gitignored** — While the `nixpkgs-lock` flake input provides pinned nixpkgs, other inputs (16 `nix-lefthook-*-src` repos) float to their latest commit on each `nix flake update`. This means builds across machines may use different versions of these inputs unless the lock is shared out-of-band.
 
 6. **`dev.sh` pre-commit hook existence check is fragile** — The guard `[ -f .git/hooks/pre-commit ]` only checks for the pre-commit hook file. If lefthook is partially installed (e.g. pre-push exists but pre-commit was deleted), the install re-runs but may not detect the partial state. Additionally, this check fails in worktrees where `.git` is a file, not a directory.
+
+7. **SPEC.md tables fail MD060 and file-size-check in CI (2026-07-04)** — Tables used unaligned pipe style (`|---|---|---|`) which violates MD060/table-column-style (markdownlint-cli 0.46). Additionally, SPEC.md at 7011 bytes exceeded the default 4096-byte file-size-check limit since no `.md` extension limit was configured. Fixed by aligning all tables and adding `md: 10240` to `config/lefthook/file_size_limits.yml`.
