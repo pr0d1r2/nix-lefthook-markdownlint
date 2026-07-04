@@ -45,3 +45,14 @@ teardown() {
     run grep -x "dev.sh" "$WATCH_LOG"
     assert_success
 }
+
+@test "watches lefthook-markdownlint.sh for changes" {
+    run bash -c '
+        watch_file() { echo "$1" >> "'"$WATCH_LOG"'"; }
+        use() { :; }
+        source .envrc
+    '
+    assert_success
+    run grep -x "lefthook-markdownlint.sh" "$WATCH_LOG"
+    assert_success
+}
