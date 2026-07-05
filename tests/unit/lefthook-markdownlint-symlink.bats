@@ -50,10 +50,10 @@ MDEOF
     assert_success
 }
 
-@test "symlink with .md extension to non-markdown file is filtered out" {
+@test "symlink with .md extension to non-markdown target is linted by name" {
     echo "not markdown" > "$TEST_TEMP/data.txt"
-    ln -s "$TEST_TEMP/data.txt" "$TEST_TEMP/link.txt"
-    run lefthook-markdownlint "$TEST_TEMP/link.txt"
+    ln -s "$TEST_TEMP/data.txt" "$TEST_TEMP/link.md"
+    run lefthook-markdownlint "$TEST_TEMP/link.md"
     assert_success
 }
 
