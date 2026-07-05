@@ -78,7 +78,7 @@ remotes:
 | `x`    | T2  | Add `nix/direnv.sh` extraction and wire it into `.envrc` to satisfy the nix/modularity skill pattern              |
 | `x`    | T3  | Add bats test for timeout behavior (verify the wrapper respects `LEFTHOOK_MARKDOWNLINT_TIMEOUT`)                  |
 | `x`    | T4  | Add bats test covering symlink edge case (`.md` symlink pointing to valid/invalid file)                           |
-| `.`    | T5  | Align `actions/checkout` version in `update-pins.yml` (v4) with `ci.yml` (v6)                                     |
+| `x`    | T5  | Align `actions/checkout` version in `update-pins.yml` (v4) with `ci.yml` (v6)                                     |
 | `.`    | T6  | Extract the inline `SCANNER=` shell fragment in the `lefthook-nix-no-embedded-shell` wrapper to a separate script |
 | `.`    | T7  | Add a bats test for `lefthook-remote.yml` validating its YAML structure and required keys                         |
 | `.`    | T8  | Add `flake.lock` tracking rationale to README (currently gitignored; `nixpkgs-lock` pin provides reproducibility) |
