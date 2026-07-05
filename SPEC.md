@@ -77,7 +77,7 @@ remotes:
 | `x`    | T1  | Add `watch_file` entries to `.envrc` for `flake.nix`, `dev.sh`, and nix modules per direnv/modularity skills      |
 | `x`    | T2  | Add `nix/direnv.sh` extraction and wire it into `.envrc` to satisfy the nix/modularity skill pattern              |
 | `x`    | T3  | Add bats test for timeout behavior (verify the wrapper respects `LEFTHOOK_MARKDOWNLINT_TIMEOUT`)                  |
-| `.`    | T4  | Add bats test covering symlink edge case (`.md` symlink pointing to valid/invalid file)                           |
+| `x`    | T4  | Add bats test covering symlink edge case (`.md` symlink pointing to valid/invalid file)                           |
 | `.`    | T5  | Align `actions/checkout` version in `update-pins.yml` (v4) with `ci.yml` (v6)                                     |
 | `.`    | T6  | Extract the inline `SCANNER=` shell fragment in the `lefthook-nix-no-embedded-shell` wrapper to a separate script |
 | `.`    | T7  | Add a bats test for `lefthook-remote.yml` validating its YAML structure and required keys                         |
@@ -101,3 +101,5 @@ remotes:
 7. **SPEC.md tables fail MD060 and file-size-check in CI (2026-07-04)** — Tables used unaligned pipe style (`|---|---|---|`) which violates MD060/table-column-style (markdownlint-cli 0.46). Additionally, SPEC.md at 7011 bytes exceeded the default 4096-byte file-size-check limit since no `.md` extension limit was configured. Fixed by aligning all tables and adding `md: 10240` to `config/lefthook/file_size_limits.yml`.
 
 8. **shfmt case-pattern indentation in lefthook-markdownlint.sh (2026-07-04)** — The `case` pattern body (`*.md)`) used 4-space indent instead of the 2-space indent that `shfmt` expects (case patterns at same level as `case`/`esac`). Fixed by reducing the indent from 4 to 2 spaces.
+
+9. **Symlink test used invalid markdown content (2026-07-05)** — The test "symlink with .md extension to non-markdown target is linted by name" used `echo "not markdown"` as file content, which fails markdownlint MD041 (first line must be a top-level heading). The test asserted success, so it always failed. Fixed by using valid markdown content (`# Heading`) so the test verifies the symlink is picked up for linting without a false lint failure.
