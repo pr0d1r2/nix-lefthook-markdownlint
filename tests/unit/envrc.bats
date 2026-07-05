@@ -13,9 +13,20 @@ teardown() {
     rm -rf "$TMPDIR"
 }
 
-@test "uses flake" {
+@test "watches nix/direnv.sh for changes" {
     run bash -c '
-        watch_file() { :; }
+        watch_file() { echo "$1" >> "'"$WATCH_LOG"'"; }
+        use() { :; }
+        source .envrc
+    '
+    assert_success
+    run grep -x "nix/direnv.sh" "$WATCH_LOG"
+    assert_success
+}
+
+@test "sources nix/direnv.sh" {
+    run bash -c '
+        watch_file() { echo "$1" >> "'"$WATCH_LOG"'"; }
         use() { echo "$*" >> "'"$USE_LOG"'"; }
         source .envrc
     '
@@ -24,7 +35,7 @@ teardown() {
     assert_output "flake"
 }
 
-@test "watches flake.nix for changes" {
+@test "transitively watches flake.nix via nix/direnv.sh" {
     run bash -c '
         watch_file() { echo "$1" >> "'"$WATCH_LOG"'"; }
         use() { :; }
@@ -35,7 +46,7 @@ teardown() {
     assert_success
 }
 
-@test "watches dev.sh for changes" {
+@test "transitively watches dev.sh via nix/direnv.sh" {
     run bash -c '
         watch_file() { echo "$1" >> "'"$WATCH_LOG"'"; }
         use() { :; }
@@ -46,7 +57,7 @@ teardown() {
     assert_success
 }
 
-@test "watches lefthook-markdownlint.sh for changes" {
+@test "transitively watches lefthook-markdownlint.sh via nix/direnv.sh" {
     run bash -c '
         watch_file() { echo "$1" >> "'"$WATCH_LOG"'"; }
         use() { :; }

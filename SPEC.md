@@ -75,7 +75,7 @@ remotes:
 | status | id  | goal                                                                                                              |
 | ------ | --- | ----------------------------------------------------------------------------------------------------------------- |
 | `x`    | T1  | Add `watch_file` entries to `.envrc` for `flake.nix`, `dev.sh`, and nix modules per direnv/modularity skills      |
-| `.`    | T2  | Add `nix/direnv.sh` extraction and wire it into `.envrc` to satisfy the nix/modularity skill pattern              |
+| `x`    | T2  | Add `nix/direnv.sh` extraction and wire it into `.envrc` to satisfy the nix/modularity skill pattern              |
 | `.`    | T3  | Add bats test for timeout behavior (verify the wrapper respects `LEFTHOOK_MARKDOWNLINT_TIMEOUT`)                  |
 | `.`    | T4  | Add bats test covering symlink edge case (`.md` symlink pointing to valid/invalid file)                           |
 | `.`    | T5  | Align `actions/checkout` version in `update-pins.yml` (v4) with `ci.yml` (v6)                                     |
