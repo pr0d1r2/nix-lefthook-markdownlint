@@ -103,3 +103,5 @@ remotes:
 8. **shfmt case-pattern indentation in lefthook-markdownlint.sh (2026-07-04)** — The `case` pattern body (`*.md)`) used 4-space indent instead of the 2-space indent that `shfmt` expects (case patterns at same level as `case`/`esac`). Fixed by reducing the indent from 4 to 2 spaces.
 
 9. **Symlink test used invalid markdown content (2026-07-05)** — The test "symlink with .md extension to non-markdown target is linted by name" used `echo "not markdown"` as file content, which fails markdownlint MD041 (first line must be a top-level heading). The test asserted success, so it always failed. Fixed by using valid markdown content (`# Heading`) so the test verifies the symlink is picked up for linting without a false lint failure.
+
+10. **Orphaned `update-pins.bats` after dropping `update-pins.yml` (2026-07-06)** — Workflow was removed but its test file stayed, causing 6 CI failures. Fixed by deleting the orphaned test.
