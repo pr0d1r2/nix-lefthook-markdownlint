@@ -80,7 +80,7 @@ remotes:
 | `x`    | T4  | Add bats test covering symlink edge case (`.md` symlink pointing to valid/invalid file)                           |
 | `x`    | T5  | Align `actions/checkout` version in `update-pins.yml` (v4) with `ci.yml` (v6)                                     |
 | `x`    | T6  | Extract the inline `SCANNER=` shell fragment in the `lefthook-nix-no-embedded-shell` wrapper to a separate script |
-| `.`    | T7  | Add a bats test for `lefthook-remote.yml` validating its YAML structure and required keys                         |
+| `x`    | T7  | Add a bats test for `lefthook-remote.yml` validating its YAML structure and required keys                         |
 | `.`    | T8  | Add `flake.lock` tracking rationale to README (currently gitignored; `nixpkgs-lock` pin provides reproducibility) |
 | `.`    | T9  | Add `markdownlint` glob to the `lefthook-remote.yml` `pre-push` section to cover `{push_files}` consistently      |
 
