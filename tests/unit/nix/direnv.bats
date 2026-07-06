@@ -46,6 +46,17 @@ teardown() {
     assert_success
 }
 
+@test "watches nix/lefthook-nix-no-embedded-shell-scanner.sh for changes" {
+    run bash -c '
+        watch_file() { echo "$1" >> "'"$WATCH_LOG"'"; }
+        use() { :; }
+        source nix/direnv.sh
+    '
+    assert_success
+    run grep -x "nix/lefthook-nix-no-embedded-shell-scanner.sh" "$WATCH_LOG"
+    assert_success
+}
+
 @test "uses flake" {
     run bash -c '
         watch_file() { :; }
