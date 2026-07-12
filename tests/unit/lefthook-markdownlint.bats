@@ -96,3 +96,37 @@ MDEOF
     run lefthook-markdownlint "$TEST_TEMP/bad.md"
     assert_failure
 }
+
+@test "skips agentic file in agent/ directory" {
+    mkdir -p "$TEST_TEMP/agent"
+    cat > "$TEST_TEMP/agent/set.md" << 'MDEOF'
+# Hello
+# Hello
+MDEOF
+    run lefthook-markdownlint "$TEST_TEMP/agent/set.md"
+    assert_success
+}
+
+@test "skips agentic SPEC.md file" {
+    mkdir -p "$TEST_TEMP/repo"
+    cat > "$TEST_TEMP/repo/SPEC.md" << 'MDEOF'
+# Hello
+# Hello
+MDEOF
+    run lefthook-markdownlint "$TEST_TEMP/repo/SPEC.md"
+    assert_success
+}
+
+@test "still lints non-agentic file alongside agentic file" {
+    mkdir -p "$TEST_TEMP/agent"
+    cat > "$TEST_TEMP/agent/set.md" << 'MDEOF'
+# Hello
+# Hello
+MDEOF
+    cat > "$TEST_TEMP/bad.md" << 'MDEOF'
+# Hello
+# Hello
+MDEOF
+    run lefthook-markdownlint "$TEST_TEMP/agent/set.md" "$TEST_TEMP/bad.md"
+    assert_failure
+}

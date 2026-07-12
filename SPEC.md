@@ -11,6 +11,7 @@ A Nix flake that packages a lefthook-compatible markdownlint wrapper (`lefthook-
 3. Missing files in the argument list are skipped silently (no error).
 4. Valid markdown files pass (exit 0); invalid markdown files fail (exit non-zero).
 5. Non-`.md` files in a mixed argument list are filtered out before linting.
+5a. Agentic markdown files (`agent/`, `.claude/`, `files/commands/`, `SPEC.md`, `CLAUDE.md`, `PROMPT.md`) are skipped — they are handled by `nix-lefthook-markdownlint-agentic`.
 6. `LEFTHOOK_MARKDOWNLINT_CONFIG` overrides the config file passed to markdownlint; the config path may live outside the repo root.
 7. When `LEFTHOOK_MARKDOWNLINT_CONFIG` is unset, markdownlint uses its default config discovery (`.markdownlint.*` walking up from cwd).
 8. The dev shell (`dev.sh`) sets `BATS_LIB_PATH` from the `@BATS_LIB_PATH@` placeholder injected by `flake.nix`.
@@ -27,9 +28,10 @@ A Nix flake that packages a lefthook-compatible markdownlint wrapper (`lefthook-
 
 ### CLI
 
-| Command                 | Synopsis                           | Description                                                                         |
-| ----------------------- | ---------------------------------- | ----------------------------------------------------------------------------------- |
-| `lefthook-markdownlint` | `lefthook-markdownlint [file ...]` | Filter `.md` files from args, run `markdownlint` on them. Exit 0 if no files match. |
+| Command                 | Synopsis                           | Description                                                                                                          |
+| ----------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `lefthook-markdownlint` | `lefthook-markdownlint [file ...]` | Filter `.md` files from args, skip agentic files, run `markdownlint` on the rest. Exit 0 if no files match.          |
+| `is-markdown-agentic`   | `is-markdown-agentic <path>`       | Exit 0 if path matches agentic patterns (`agent/`, `.claude/`, `files/commands/`, `SPEC.md`, `CLAUDE.md`, `PROMPT.md`). |
 
 ### Environment variables
 
@@ -41,9 +43,10 @@ A Nix flake that packages a lefthook-compatible markdownlint wrapper (`lefthook-
 
 ### Nix flake outputs
 
-| Output                       | Description                                                                                                   |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `packages.<system>.default`  | `writeShellApplication` wrapping `lefthook-markdownlint.sh` with `markdownlint-cli` on `PATH`.                |
+| Output                                  | Description                                                                                                   |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `packages.<system>.default`             | `writeShellApplication` wrapping `lefthook-markdownlint.sh` with `markdownlint-cli` and `is-markdown-agentic` on `PATH`. |
+| `packages.<system>.is-markdown-agentic` | `writeShellApplication` wrapping `is-markdown-agentic.sh` — agentic-file path detector.                       |
 | `devShells.<system>.default` | Development shell with all tools: bats (with libs), lefthook, linter wrappers, coreutils, git, nix, parallel. |
 | `devShells.<system>.ci`      | Alias for `default`; used by CI.                                                                              |
 
@@ -83,6 +86,7 @@ remotes:
 | `x`    | T7  | Add a bats test for `lefthook-remote.yml` validating its YAML structure and required keys                         |
 | `x`    | T8  | Add `flake.lock` tracking rationale to README (currently gitignored; `nixpkgs-lock` pin provides reproducibility) |
 | `x`    | T9  | Add `markdownlint` glob to the `lefthook-remote.yml` `pre-push` section to cover `{push_files}` consistently      |
+| `x`    | T10 | Exclude agentic files from MD013 line-length — delegate to `markdownlint-agentic` (#23)                            |
 
 ## §B — Bugs / Known Issues
 
