@@ -208,13 +208,26 @@
         ]);
     in
     {
-      packages = forAllSystems (pkgs: {
-        default = pkgs.writeShellApplication {
-          name = "lefthook-markdownlint";
-          runtimeInputs = [ pkgs.markdownlint-cli ];
-          text = builtins.readFile ./lefthook-markdownlint.sh;
-        };
-      });
+      packages = forAllSystems (
+        pkgs:
+        let
+          is-markdown-agentic = pkgs.writeShellApplication {
+            name = "is-markdown-agentic";
+            text = builtins.readFile ./is-markdown-agentic.sh;
+          };
+        in
+        {
+          inherit is-markdown-agentic;
+          default = pkgs.writeShellApplication {
+            name = "lefthook-markdownlint";
+            runtimeInputs = [
+              pkgs.markdownlint-cli
+              is-markdown-agentic
+            ];
+            text = builtins.readFile ./lefthook-markdownlint.sh;
+          };
+        }
+      );
 
       devShells = forAllSystems (
         pkgs:
@@ -226,6 +239,7 @@
           default = pkgs.mkShell {
             packages = [
               self.packages.${system}.default
+              self.packages.${system}.is-markdown-agentic
               batsWithLibs
               pkgs.coreutils
               pkgs.git
