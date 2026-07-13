@@ -46,6 +46,17 @@ teardown() {
     assert_success
 }
 
+@test "watches is-markdown-agentic.sh for changes" {
+    run bash -c '
+        watch_file() { echo "$1" >> "'"$WATCH_LOG"'"; }
+        use() { :; }
+        source nix/direnv.sh
+    '
+    assert_success
+    run grep -x "is-markdown-agentic.sh" "$WATCH_LOG"
+    assert_success
+}
+
 @test "watches nix/lefthook-nix-no-embedded-shell-scanner.sh for changes" {
     run bash -c '
         watch_file() { echo "$1" >> "'"$WATCH_LOG"'"; }
