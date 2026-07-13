@@ -9,12 +9,12 @@ if [ $# -ne 1 ]; then
 fi
 
 case "$1" in
-agent/* | */agent/*) exit 0 ;;
-.claude/* | */.claude/*) exit 0 ;;
-files/commands/* | */files/commands/*) exit 0 ;;
-SPEC.md | */SPEC.md) exit 0 ;;
-CLAUDE.md | */CLAUDE.md) exit 0 ;;
-PROMPT.md | */PROMPT.md) exit 0 ;;
+  agent/* | */agent/*) exit 0 ;;
+  .claude/* | */.claude/*) exit 0 ;;
+  files/commands/* | */files/commands/*) exit 0 ;;
+  SPEC.md | */SPEC.md) exit 0 ;;
+  CLAUDE.md | */CLAUDE.md) exit 0 ;;
+  PROMPT.md | */PROMPT.md) exit 0 ;;
 esac
 
 exit 1
