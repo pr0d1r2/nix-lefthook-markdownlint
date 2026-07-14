@@ -37,6 +37,10 @@
       url = "github:pr0d1r2/nix-lefthook-git-no-local-paths";
       flake = false;
     };
+    nix-lefthook-markdownlint-agentic-src = {
+      url = "github:pr0d1r2/nix-lefthook-markdownlint-agentic";
+      flake = false;
+    };
     nix-lefthook-missing-final-newline-src = {
       url = "github:pr0d1r2/nix-lefthook-missing-final-newline";
       flake = false;
@@ -86,6 +90,7 @@
       nix-lefthook-file-size-check-src,
       nix-lefthook-git-conflict-markers-src,
       nix-lefthook-git-no-local-paths-src,
+      nix-lefthook-markdownlint-agentic-src,
       nix-lefthook-missing-final-newline-src,
       nix-lefthook-nix-no-embedded-shell-src,
       nix-lefthook-nixfmt-src,
@@ -165,6 +170,15 @@
           })
           (wrap "lefthook-git-no-local-paths" nix-lefthook-git-no-local-paths-src {
             runtimeInputs = [ pkgs.gnugrep ];
+          })
+          (pkgs.writeShellApplication {
+            name = "lefthook-markdownlint-agentic";
+            runtimeInputs = [ pkgs.markdownlint-cli ];
+            text =
+              builtins.replaceStrings
+                [ "@MARKDOWNLINT_AGENTIC_CONFIG@" ]
+                [ "${nix-lefthook-markdownlint-agentic-src}/.markdownlint-agentic.yml" ]
+                (builtins.readFile "${nix-lefthook-markdownlint-agentic-src}/lefthook-markdownlint-agentic.sh");
           })
           (wrap "lefthook-missing-final-newline" nix-lefthook-missing-final-newline-src { })
           (pkgs.writeShellApplication {
