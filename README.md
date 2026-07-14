@@ -6,7 +6,8 @@
 
 Lefthook-compatible [markdownlint](https://github.com/igorshubovych/markdownlint-cli) wrapper, packaged as a Nix flake.
 
-Filters `.md` files from staged arguments and runs markdownlint on them. Exits 0 when no matching files are found. Agentic files (`agent/`, `.claude/`, `files/commands/`, `SPEC.md`, `CLAUDE.md`, `PROMPT.md`) are automatically skipped — use [nix-lefthook-markdownlint-agentic](https://github.com/pr0d1r2/nix-lefthook-markdownlint-agentic) for those.
+Filters `.md` files from staged arguments and runs markdownlint on them. Exits 0 when no matching files are found.
+Agentic files (`agent/`, `.claude/`, `files/commands/`, `SPEC.md`, `CLAUDE.md`, `PROMPT.md`) are automatically skipped — use [nix-lefthook-markdownlint-agentic](https://github.com/pr0d1r2/nix-lefthook-markdownlint-agentic) for those.
 
 ## Usage
 
