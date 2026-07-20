@@ -65,12 +65,24 @@
       devShells = forAllSystems (
         pkgs:
         let
+          bats = pkgs.bats.withLibraries (p: [
+            p.bats-assert
+            p.bats-file
+            p.bats-support
+          ]);
           mat = set-and-setting.lib.materializationFor { inherit pkgs fragments; };
           sys = pkgs.stdenv.hostPlatform.system;
         in
         set-and-setting.lib.mkDevShells {
           inherit pkgs;
-          basePackages = mat.packages;
+          basePackages = [
+            bats
+            pkgs.nix
+            pkgs.parallel
+            self.packages.${sys}.default
+            self.packages.${sys}.is-markdown-agentic
+          ]
+          ++ mat.packages;
           settingHook = ''
             ${self.packages.${sys}.setting}/bin/sync-setting .
             _assemble_out="$(mktemp -d)"
@@ -80,6 +92,7 @@
               bash "${set-and-setting}/setting/lib/assemble-lefthook.sh"
             cp -f "$_assemble_out/lefthook.yml" lefthook.yml
             rm -rf "$_assemble_out"
+            ${builtins.replaceStrings [ "@BATS_LIB_PATH@" ] [ "${bats}" ] (builtins.readFile ./dev.sh)}
           '';
         }
       );
@@ -110,7 +123,12 @@
             program = "${
               pkgs.writeShellApplication {
                 name = "confirm";
-                runtimeInputs = mat.packages ++ [
+                runtimeInputs = [
+                  self.packages.${pkgs.stdenv.hostPlatform.system}.default
+                  self.packages.${pkgs.stdenv.hostPlatform.system}.is-markdown-agentic
+                ]
+                ++ mat.packages
+                ++ [
                   pkgs.coreutils
                   pkgs.diffutils
                   pkgs.findutils

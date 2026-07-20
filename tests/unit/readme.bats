@@ -17,7 +17,7 @@ setup() {
 }
 
 @test "explains flake.lock is tracked" {
-    run grep -F 'flake.lock is tracked' "$README"
+    run grep -F '`flake.lock` is tracked' "$README"
     assert_success
 }
 

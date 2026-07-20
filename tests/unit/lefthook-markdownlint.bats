@@ -40,8 +40,15 @@ MDEOF
 
 @test "detects invalid markdown" {
     cat > "$TEST_TEMP/bad.md" << 'MDEOF'
-# Hello
-# Hello
+# Title
+
+## Repeated
+
+Text.
+
+## Repeated
+
+Text.
 MDEOF
     run lefthook-markdownlint "$TEST_TEMP/bad.md"
     assert_failure
@@ -59,17 +66,24 @@ MDEOF
 }
 
 @test "LEFTHOOK_MARKDOWNLINT_CONFIG applies a custom config" {
-    # Config disabling all rules -> otherwise-invalid markdown passes,
-    # proving the config file is honored.
+    # Override the repository's MD024 setting so otherwise-invalid markdown
+    # passes, proving the selected config file is honored.
     cat > "$TEST_TEMP/relaxed.yml" << 'CFGEOF'
-default: false
+MD024: false
 CFGEOF
     cat > "$TEST_TEMP/bad.md" << 'MDEOF'
-# Hello
-# Hello
+# Title
+
+## Repeated
+
+Text.
+
+## Repeated
+
+Text.
 MDEOF
-    LEFTHOOK_MARKDOWNLINT_CONFIG="$TEST_TEMP/relaxed.yml" \
-        run lefthook-markdownlint "$TEST_TEMP/bad.md"
+    export LEFTHOOK_MARKDOWNLINT_CONFIG="$TEST_TEMP/relaxed.yml"
+    run lefthook-markdownlint "$TEST_TEMP/bad.md"
     assert_success
 }
 
@@ -77,14 +91,21 @@ MDEOF
     # The config need not be a committed root file (e.g. a nix out-link).
     mkdir -p "$TEST_TEMP/out/link"
     cat > "$TEST_TEMP/out/link/.markdownlint.yml" << 'CFGEOF'
-default: false
+MD024: false
 CFGEOF
     cat > "$TEST_TEMP/bad.md" << 'MDEOF'
-# Hello
-# Hello
+# Title
+
+## Repeated
+
+Text.
+
+## Repeated
+
+Text.
 MDEOF
-    LEFTHOOK_MARKDOWNLINT_CONFIG="$TEST_TEMP/out/link/.markdownlint.yml" \
-        run lefthook-markdownlint "$TEST_TEMP/bad.md"
+    export LEFTHOOK_MARKDOWNLINT_CONFIG="$TEST_TEMP/out/link/.markdownlint.yml"
+    run lefthook-markdownlint "$TEST_TEMP/bad.md"
     assert_success
 }
 
