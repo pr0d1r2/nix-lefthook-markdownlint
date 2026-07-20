@@ -99,36 +99,42 @@
         }
       );
 
-      apps = forAllSystems (pkgs: {
-        confirm = {
-          type = "app";
-          program = "${
-            pkgs.writeShellApplication {
-              name = "confirm";
-              runtimeInputs = [
-                pkgs.coreutils
-                pkgs.diffutils
-                pkgs.findutils
-                pkgs.gawk
-                pkgs.git
-                pkgs.gnugrep
-              ];
-              text =
-                builtins.replaceStrings
-                  [
-                    "@SET_AND_SETTING@"
-                    "@SETTING_SRC@"
-                    "@CONFIRM_REV@"
-                  ]
-                  [
-                    "${set-and-setting}"
-                    "${self.packages.${pkgs.stdenv.hostPlatform.system}.setting}"
-                    "${set-and-setting.rev or "unknown"}"
-                  ]
-                  (builtins.readFile ./nix/confirm.sh);
-            }
-          }/bin/confirm";
-        };
-      });
+      apps = forAllSystems (
+        pkgs:
+        let
+          mat = set-and-setting.lib.materializationFor { inherit pkgs fragments; };
+        in
+        {
+          confirm = {
+            type = "app";
+            program = "${
+              pkgs.writeShellApplication {
+                name = "confirm";
+                runtimeInputs = mat.packages ++ [
+                  pkgs.coreutils
+                  pkgs.diffutils
+                  pkgs.findutils
+                  pkgs.gawk
+                  pkgs.git
+                  pkgs.gnugrep
+                ];
+                text =
+                  builtins.replaceStrings
+                    [
+                      "@SET_AND_SETTING@"
+                      "@SETTING_SRC@"
+                      "@CONFIRM_REV@"
+                    ]
+                    [
+                      "${set-and-setting}"
+                      "${self.packages.${pkgs.stdenv.hostPlatform.system}.setting}"
+                      "${set-and-setting.rev or "unknown"}"
+                    ]
+                    (builtins.readFile ./nix/confirm.sh);
+              }
+            }/bin/confirm";
+          };
+        }
+      );
     };
 }
