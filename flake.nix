@@ -40,33 +40,27 @@
       ];
     in
     {
-      packages = forAllSystems (pkgs: {
-        default = pkgs.writeShellApplication {
-          name = "lefthook-markdownlint";
-          runtimeInputs = [
-            pkgs.markdownlint-cli
-            is-markdown-agentic
-          ];
-          text = builtins.readFile ./lefthook-markdownlint.sh;
-        };
-        default = pkgs.mkShell {
-          packages = [
-            self.packages.${system}.default
-            self.packages.${system}.is-markdown-agentic
-            batsWithLibs
-            pkgs.coreutils
-            pkgs.git
-            pkgs.lefthook
-            pkgs.nix
-            pkgs.parallel
-          ]
-          ++ (lefthookWrappersFor pkgs);
-          shellHook = builtins.replaceStrings [ "@BATS_LIB_PATH@" ] [ "${batsWithLibs}" ] (
-            builtins.readFile ./dev.sh
-          );
-        };
-        setting = (set-and-setting.lib.mkSetting { inherit pkgs; }).materialized;
-      });
+      packages = forAllSystems (
+        pkgs:
+        let
+          is-markdown-agentic = pkgs.writeShellApplication {
+            name = "is-markdown-agentic";
+            text = builtins.readFile ./is-markdown-agentic.sh;
+          };
+        in
+        {
+          default = pkgs.writeShellApplication {
+            name = "lefthook-markdownlint";
+            runtimeInputs = [
+              pkgs.markdownlint-cli
+              is-markdown-agentic
+            ];
+            text = builtins.readFile ./lefthook-markdownlint.sh;
+          };
+          inherit is-markdown-agentic;
+          setting = (set-and-setting.lib.mkSetting { inherit pkgs; }).materialized;
+        }
+      );
 
       devShells = forAllSystems (
         pkgs:
@@ -119,15 +113,19 @@
                 pkgs.git
                 pkgs.gnugrep
               ];
-              text = ''
-                export FRAGMENTS_DIR="${set-and-setting}/setting/integrations/lefthook"
-                export ASSEMBLE_SCRIPT="${set-and-setting}/setting/lib/assemble-lefthook.sh"
-                export DETECT_SCRIPT="${set-and-setting}/setting/lib/detect-fragments.sh"
-                export SETTING_SRC="${self.packages.${pkgs.stdenv.hostPlatform.system}.setting}"
-                export CONFIRM_SCRIPT="${set-and-setting}/lib/confirm.sh"
-                export CONFIRM_REV="${set-and-setting.rev or "unknown"}"
-                bash "$CONFIRM_SCRIPT"
-              '';
+              text =
+                builtins.replaceStrings
+                  [
+                    "@SET_AND_SETTING@"
+                    "@SETTING_SRC@"
+                    "@CONFIRM_REV@"
+                  ]
+                  [
+                    "${set-and-setting}"
+                    "${self.packages.${pkgs.stdenv.hostPlatform.system}.setting}"
+                    "${set-and-setting.rev or "unknown"}"
+                  ]
+                  (builtins.readFile ./nix/confirm.sh);
             }
           }/bin/confirm";
         };

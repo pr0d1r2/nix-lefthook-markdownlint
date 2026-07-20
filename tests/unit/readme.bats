@@ -16,8 +16,8 @@ setup() {
     assert_success
 }
 
-@test "explains flake.lock is gitignored" {
-    run grep -i 'gitignore' "$README"
+@test "explains flake.lock is tracked" {
+    run grep -F 'flake.lock is tracked' "$README"
     assert_success
 }
 
