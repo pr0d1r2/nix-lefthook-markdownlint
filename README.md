@@ -76,13 +76,12 @@ bats tests/unit/
 
 ### Reproducibility
 
-`flake.lock` is intentionally **gitignored** and not tracked in this repo.
-Reproducibility of the nixpkgs package set instead comes from the
-[`nixpkgs-lock`](https://github.com/pr0d1r2/nixpkgs-lock) flake input: `nixpkgs`
-is set to `follows = "nixpkgs-lock/nixpkgs"`, so nixpkgs is pinned to a
-known-good revision by that upstream flake rather than by a local lock file.
-Every machine therefore resolves the same nixpkgs without committing
-`flake.lock`.
+`flake.lock` is tracked so every flake input is reproducible and the dependency
+graph check can inspect the complete resolved graph. The
+[`nixpkgs-lock`](https://github.com/pr0d1r2/nixpkgs-lock) input remains the
+central pin for the nixpkgs package set: `nixpkgs` follows
+`nixpkgs-lock/nixpkgs`, while the local lock file pins that input and all other
+transitive inputs to exact revisions.
 
 ## License
 
