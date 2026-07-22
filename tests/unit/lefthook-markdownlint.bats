@@ -6,10 +6,20 @@ setup() {
     load "$BATS_LIB_PATH/bats-file/load"
 
     TEST_TEMP="$(mktemp -d)"
+    BASH_BIN="$(command -v bash)"
 }
 
 teardown() {
     rm -rf "$TEST_TEMP"
+}
+
+make_markdownlint_stub() {
+    mkdir -p "$TEST_TEMP/bin"
+    cat > "$TEST_TEMP/bin/markdownlint" << 'SH'
+#!/bin/sh
+printf '%s\n' "$@"
+SH
+    chmod +x "$TEST_TEMP/bin/markdownlint"
 }
 
 @test "exits 0 with no arguments" {
@@ -150,4 +160,25 @@ MDEOF
 MDEOF
     run lefthook-markdownlint "$TEST_TEMP/agent/set.md" "$TEST_TEMP/bad.md"
     assert_failure
+}
+
+@test "missing classifier silently treats ordinary markdown as non-agentic" {
+    make_markdownlint_stub
+    touch "$TEST_TEMP/README.md"
+
+    run env PATH="$TEST_TEMP/bin" "$BASH_BIN" lefthook-markdownlint.sh "$TEST_TEMP/README.md"
+
+    assert_success
+    assert_output "$TEST_TEMP/README.md"
+}
+
+@test "missing classifier safely treats agentic paths as non-agentic" {
+    make_markdownlint_stub
+    mkdir -p "$TEST_TEMP/agent"
+    touch "$TEST_TEMP/agent/set.md"
+
+    run env PATH="$TEST_TEMP/bin" "$BASH_BIN" lefthook-markdownlint.sh "$TEST_TEMP/agent/set.md"
+
+    assert_success
+    assert_output "$TEST_TEMP/agent/set.md"
 }

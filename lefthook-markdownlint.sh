@@ -6,12 +6,17 @@ if [ $# -eq 0 ]; then
   exit 0
 fi
 
+classifier_available=false
+if command -v is-markdown-agentic >/dev/null 2>&1; then
+  classifier_available=true
+fi
+
 files=()
 for f in "$@"; do
   [ -f "$f" ] || continue
   case "$f" in
     *.md)
-      if is-markdown-agentic "$f"; then
+      if "$classifier_available" && is-markdown-agentic "$f"; then
         continue
       fi
       files+=("$f")
