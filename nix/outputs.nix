@@ -1,36 +1,50 @@
-inputs@{ self, nixpkgs, set-and-setting, ... }:
 {
-      packages = nixpkgs.lib.genAttrs [
+  self,
+  nixpkgs,
+  set-and-setting,
+  ...
+}:
+{
+  packages =
+    nixpkgs.lib.genAttrs
+      [
         "aarch64-darwin"
         "x86_64-darwin"
         "x86_64-linux"
         "aarch64-linux"
-      ] (
+      ]
+      (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
           is-markdown-agentic = pkgs.writeShellApplication {
             name = "is-markdown-agentic";
-            text = builtins.readFile ./is-markdown-agentic.sh;
+            text = builtins.readFile ../is-markdown-agentic.sh;
           };
         in
         {
           default = pkgs.writeShellApplication {
             name = "lefthook-markdownlint";
-            runtimeInputs = [ pkgs.markdownlint-cli is-markdown-agentic ];
-            text = builtins.readFile ./lefthook-markdownlint.sh;
+            runtimeInputs = [
+              pkgs.markdownlint-cli
+              is-markdown-agentic
+            ];
+            text = builtins.readFile ../lefthook-markdownlint.sh;
           };
           inherit is-markdown-agentic;
           setting = (set-and-setting.lib.mkSetting { inherit pkgs; }).materialized;
         }
       );
 
-      devShells = nixpkgs.lib.genAttrs [
+  devShells =
+    nixpkgs.lib.genAttrs
+      [
         "aarch64-darwin"
         "x86_64-darwin"
         "x86_64-linux"
         "aarch64-linux"
-      ] (
+      ]
+      (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
@@ -39,7 +53,14 @@ inputs@{ self, nixpkgs, set-and-setting, ... }:
             p.bats-file
             p.bats-support
           ]);
-          fragments = [ "base" "nix" "shell" "ascii" "markdown" "yaml" ];
+          fragments = [
+            "base"
+            "nix"
+            "shell"
+            "ascii"
+            "markdown"
+            "yaml"
+          ];
           mat = set-and-setting.lib.materializationFor { inherit pkgs fragments; };
           sys = pkgs.stdenv.hostPlatform.system;
         in
@@ -62,45 +83,65 @@ inputs@{ self, nixpkgs, set-and-setting, ... }:
               bash "${set-and-setting}/setting/lib/assemble-lefthook.sh"
             cp -f "$_assemble_out/lefthook.yml" lefthook.yml
             rm -rf "$_assemble_out"
-            ${builtins.replaceStrings [ "@BATS_LIB_PATH@" ] [ "${bats}" ] (builtins.readFile ./dev.sh)}
+            ${builtins.replaceStrings [ "@BATS_LIB_PATH@" ] [ "${bats}" ] (builtins.readFile ../dev.sh)}
           '';
         }
       );
 
-      checks = nixpkgs.lib.genAttrs [
+  checks =
+    nixpkgs.lib.genAttrs
+      [
         "aarch64-darwin"
         "x86_64-darwin"
         "x86_64-linux"
         "aarch64-linux"
-      ] (
+      ]
+      (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in
         (set-and-setting.lib.checksFor {
           inherit pkgs;
-          fragments = [ "base" "nix" "shell" "ascii" "markdown" "yaml" ];
-          src = ./.;
+          fragments = [
+            "base"
+            "nix"
+            "shell"
+            "ascii"
+            "markdown"
+            "yaml"
+          ];
+          src = ../.;
         })
         // {
           dep-graph = set-and-setting.lib.mkDepGraphCheck {
             pkgs = nixpkgs.legacyPackages.${system};
-            projectRoot = ./.;
+            projectRoot = ../.;
           };
           default = pkgs.runCommand "checks" { } "touch $out";
         }
       );
 
-      apps = nixpkgs.lib.genAttrs [
+  apps =
+    nixpkgs.lib.genAttrs
+      [
         "aarch64-darwin"
         "x86_64-darwin"
         "x86_64-linux"
         "aarch64-linux"
-      ] (
+      ]
+      (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          fragments = [ "base" "nix" "shell" "ascii" "markdown" "yaml" ];
+          fragments = [
+            "base"
+            "nix"
+            "shell"
+            "ascii"
+            "markdown"
+            "yaml"
+          ];
           mat = set-and-setting.lib.materializationFor { inherit pkgs fragments; };
         in
         {
@@ -134,10 +175,10 @@ inputs@{ self, nixpkgs, set-and-setting, ... }:
                       "${self.packages.${pkgs.stdenv.hostPlatform.system}.setting}"
                       "${set-and-setting.rev or "unknown"}"
                     ]
-                    (builtins.readFile ./nix/confirm.sh);
+                    (builtins.readFile ./confirm.sh);
               }
             }/bin/confirm";
           };
         }
       );
-    }
+}
