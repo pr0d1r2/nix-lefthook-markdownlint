@@ -117,3 +117,5 @@ remotes:
 13. **Confirm app omitted lefthook wrappers (2026-07-20)** — Its isolated runtime lacked the three tools referenced by `lefthook.yml`. Fixed by adding fragment-derived packages to its runtime inputs.
 
 14. **Updated flake lock exceeded the file-size limit (2026-08-04)** — The generated `flake.lock` grew to 321772 bytes after the pin refresh, exceeding the 262144-byte `.lock` allowance and failing the `file-size-check` guardrail. Fixed by raising the `.lock` extension limit to 393216 bytes; the required bug-history entry then took `SPEC.md` past its 12288-byte limit, so the growing Markdown documentation allowance was raised to 16384 bytes. The default and code-file limits remain unchanged.
+
+15. **Flake manifest rejected output construction (2026-08-07)** — The guardrail rejected the flake’s top-level `let` bindings and direct output attrset. Fixed by delegating `outputs` to `nix/outputs.nix`, with the same outputs defined in the delegated module.
