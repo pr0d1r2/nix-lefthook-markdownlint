@@ -3,5 +3,6 @@ watch_file flake.nix
 watch_file dev.sh
 watch_file lefthook-markdownlint.sh
 watch_file is-markdown-agentic.sh
+watch_file nix/outputs.nix
 watch_file nix/lefthook-nix-no-embedded-shell-scanner.sh
 use flake
