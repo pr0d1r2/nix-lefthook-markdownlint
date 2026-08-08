@@ -1,0 +1,184 @@
+{
+  self,
+  nixpkgs,
+  set-and-setting,
+  ...
+}:
+{
+  packages =
+    nixpkgs.lib.genAttrs
+      [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ]
+      (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          is-markdown-agentic = pkgs.writeShellApplication {
+            name = "is-markdown-agentic";
+            text = builtins.readFile ../is-markdown-agentic.sh;
+          };
+        in
+        {
+          default = pkgs.writeShellApplication {
+            name = "lefthook-markdownlint";
+            runtimeInputs = [
+              pkgs.markdownlint-cli
+              is-markdown-agentic
+            ];
+            text = builtins.readFile ../lefthook-markdownlint.sh;
+          };
+          inherit is-markdown-agentic;
+          setting = (set-and-setting.lib.mkSetting { inherit pkgs; }).materialized;
+        }
+      );
+
+  devShells =
+    nixpkgs.lib.genAttrs
+      [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ]
+      (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          bats = pkgs.bats.withLibraries (p: [
+            p.bats-assert
+            p.bats-file
+            p.bats-support
+          ]);
+          fragments = [
+            "base"
+            "nix"
+            "shell"
+            "ascii"
+            "markdown"
+            "yaml"
+          ];
+          mat = set-and-setting.lib.materializationFor { inherit pkgs fragments; };
+          sys = pkgs.stdenv.hostPlatform.system;
+        in
+        set-and-setting.lib.mkDevShells {
+          inherit pkgs;
+          basePackages = [
+            bats
+            pkgs.nix
+            pkgs.parallel
+            self.packages.${sys}.default
+            self.packages.${sys}.is-markdown-agentic
+          ]
+          ++ mat.packages;
+          settingHook = ''
+            ${self.packages.${sys}.setting}/bin/sync-setting .
+            _assemble_out="$(mktemp -d)"
+            FRAGMENTS="${builtins.concatStringsSep " " fragments}" \
+              out="$_assemble_out" \
+              FRAGMENTS_DIR="${set-and-setting}/setting/integrations/lefthook" \
+              bash "${set-and-setting}/setting/lib/assemble-lefthook.sh"
+            cp -f "$_assemble_out/lefthook.yml" lefthook.yml
+            rm -rf "$_assemble_out"
+            ${builtins.replaceStrings [ "@BATS_LIB_PATH@" ] [ "${bats}" ] (builtins.readFile ../dev.sh)}
+          '';
+        }
+      );
+
+  checks =
+    nixpkgs.lib.genAttrs
+      [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ]
+      (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        (set-and-setting.lib.checksFor {
+          inherit pkgs;
+          fragments = [
+            "base"
+            "nix"
+            "shell"
+            "ascii"
+            "markdown"
+            "yaml"
+          ];
+          src = ../.;
+        })
+        // {
+          dep-graph = set-and-setting.lib.mkDepGraphCheck {
+            pkgs = nixpkgs.legacyPackages.${system};
+            projectRoot = ../.;
+          };
+          default = pkgs.runCommand "checks" { } "touch $out";
+        }
+      );
+
+  apps =
+    nixpkgs.lib.genAttrs
+      [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ]
+      (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          fragments = [
+            "base"
+            "nix"
+            "shell"
+            "ascii"
+            "markdown"
+            "yaml"
+          ];
+          mat = set-and-setting.lib.materializationFor { inherit pkgs fragments; };
+        in
+        {
+          confirm = {
+            type = "app";
+            program = "${
+              pkgs.writeShellApplication {
+                name = "confirm";
+                runtimeInputs = [
+                  self.packages.${pkgs.stdenv.hostPlatform.system}.default
+                  self.packages.${pkgs.stdenv.hostPlatform.system}.is-markdown-agentic
+                ]
+                ++ mat.packages
+                ++ [
+                  pkgs.coreutils
+                  pkgs.diffutils
+                  pkgs.findutils
+                  pkgs.gawk
+                  pkgs.git
+                  pkgs.gnugrep
+                ];
+                text =
+                  builtins.replaceStrings
+                    [
+                      "@SET_AND_SETTING@"
+                      "@SETTING_SRC@"
+                      "@CONFIRM_REV@"
+                    ]
+                    [
+                      "${set-and-setting}"
+                      "${self.packages.${pkgs.stdenv.hostPlatform.system}.setting}"
+                      "${set-and-setting.rev or "unknown"}"
+                    ]
+                    (builtins.readFile ./confirm.sh);
+              }
+            }/bin/confirm";
+          };
+        }
+      );
+}
