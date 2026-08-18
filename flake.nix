@@ -25,7 +25,6 @@
       inherit self nixpkgs set-and-setting;
       fragments = [
         "base"
-        "actions"
         "nix"
         "shell"
         "ascii"
@@ -33,5 +32,12 @@
         "yaml"
       ];
       src = ./.;
+      extraChecks = pkgs: {
+        actionlint = pkgs.runCommand "actionlint-check" { nativeBuildInputs = [ pkgs.actionlint ]; } ''
+          WORKFLOWS_DIR=${./.}/.github/workflows \
+            out=$out \
+            bash ${./nix/actionlint-check.sh}
+        '';
+      };
     };
 }
