@@ -24,7 +24,8 @@
     set-and-setting.lib.mkConsumerFlake {
       inherit self nixpkgs set-and-setting;
       lib = set-and-setting.lib // {
-        checksFor = args:
+        checksFor =
+          args:
           set-and-setting.lib.checksFor (
             args
             // {
