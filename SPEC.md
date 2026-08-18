@@ -121,3 +121,5 @@ remotes:
 15. **Flake manifest rejected output construction (2026-08-07)** — The guardrail rejected the flake’s top-level `let` bindings and direct output attrset. Fixed by delegating `outputs` to `nix/outputs.nix`, with the same outputs defined in the delegated module.
 
 16. **Delegated flake outputs resolved root files under `nix/` (2026-08-07)** — Moving the outputs expression to `nix/outputs.nix` changed relative paths such as `./is-markdown-agentic.sh` to `nix/is-markdown-agentic.sh`, causing evaluation to fail because the scripts live at the repository root. Fixed by using parent-relative paths for root files and source directories.
+
+17. **Guardrail fidelity failed on missing actions fragment (2026-08-18)** — The flake declared only six standard fragments, so generated `lefthook.yml` omitted the action-lint configuration expected by the guardrail. Fixed by adding the `actions` fragment to the consumer, dev-shell, and confirm-app materialization declarations.
