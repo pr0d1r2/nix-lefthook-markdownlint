@@ -21,34 +21,40 @@
       set-and-setting,
       ...
     }:
-    set-and-setting.lib.mkConsumerFlake {
+    let
+      consumer = set-and-setting.lib.mkConsumerFlake {
+        inherit self nixpkgs set-and-setting;
+        lib = set-and-setting.lib // {
+          checksFor =
+            args:
+            set-and-setting.lib.checksFor (
+              args
+              // {
+                fragments = builtins.filter (fragment: fragment != "actions") args.fragments;
+              }
+            );
+        };
+        fragments = [
+          "base"
+          "actions"
+          "nix"
+          "shell"
+          "ascii"
+          "markdown"
+          "yaml"
+        ];
+        src = ./.;
+        extraChecks = pkgs: {
+          actionlint = pkgs.runCommand "actionlint-check" { nativeBuildInputs = [ pkgs.actionlint ]; } ''
+            WORKFLOWS_DIR=${./.}/.github/workflows \
+              out=$out \
+              bash ${./nix/actionlint-check.sh}
+          '';
+        };
+      };
+    in
+    consumer
+    // import ./nix/outputs.nix {
       inherit self nixpkgs set-and-setting;
-      lib = set-and-setting.lib // {
-        checksFor =
-          args:
-          set-and-setting.lib.checksFor (
-            args
-            // {
-              fragments = builtins.filter (fragment: fragment != "actions") args.fragments;
-            }
-          );
-      };
-      fragments = [
-        "base"
-        "actions"
-        "nix"
-        "shell"
-        "ascii"
-        "markdown"
-        "yaml"
-      ];
-      src = ./.;
-      extraChecks = pkgs: {
-        actionlint = pkgs.runCommand "actionlint-check" { nativeBuildInputs = [ pkgs.actionlint ]; } ''
-          WORKFLOWS_DIR=${./.}/.github/workflows \
-            out=$out \
-            bash ${./nix/actionlint-check.sh}
-        '';
-      };
     };
 }
