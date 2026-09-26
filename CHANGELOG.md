@@ -12,3 +12,5 @@ All notable changes to this project are documented here.
 - Restore the `lefthook-markdownlint` (default) and `is-markdown-agentic`
   packages, the package build check, and the flake description, all
   dropped by the vendored-to-referenced migration.
+- Put the packaged wrapper and classifier first on every devShell PATH so
+  the unit tests exercise this repository's code, not the pinned copy.
