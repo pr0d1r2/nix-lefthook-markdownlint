@@ -1,5 +1,5 @@
 {
-  description = "CHANGEME";
+  description = "Lefthook-compatible markdownlint check";
 
   nixConfig = {
     extra-substituters = [ "https://pr0d1r2.cachix.org" ];
@@ -36,7 +36,22 @@
         "yaml"
       ];
       src = ./.;
+      extraPackages = pkgs: {
+        default = pkgs.writeShellApplication {
+          name = "lefthook-markdownlint";
+          runtimeInputs = [
+            pkgs.markdownlint-cli
+            self.packages.${pkgs.stdenv.hostPlatform.system}.is-markdown-agentic
+          ];
+          text = builtins.readFile ./lefthook-markdownlint.sh;
+        };
+        is-markdown-agentic = pkgs.writeShellApplication {
+          name = "is-markdown-agentic";
+          text = builtins.readFile ./is-markdown-agentic.sh;
+        };
+      };
       extraChecks = pkgs: {
+        package = self.packages.${pkgs.stdenv.hostPlatform.system}.default;
         actionlint = pkgs.runCommand "actionlint-check" { nativeBuildInputs = [ pkgs.actionlint ]; } ''
           WORKFLOWS_DIR=${./.}/.github/workflows \
             out=$out \
