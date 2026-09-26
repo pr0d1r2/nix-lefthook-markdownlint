@@ -14,3 +14,5 @@ All notable changes to this project are documented here.
   dropped by the vendored-to-referenced migration.
 - Put the packaged wrapper and classifier first on every devShell PATH so
   the unit tests exercise this repository's code, not the pinned copy.
+- Unit tests load bats libraries with `bats_load_library` and no longer
+  reassign `TMPDIR`.

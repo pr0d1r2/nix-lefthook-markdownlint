@@ -1,13 +1,13 @@
 #!/usr/bin/env bats
 
 setup() {
-    load "${BATS_LIB_PATH}/bats-support/load.bash"
-    load "${BATS_LIB_PATH}/bats-assert/load.bash"
+    bats_load_library bats-support
+    bats_load_library bats-assert
 
     CONFIG="lefthook-remote.yml"
-    TMPDIR="$(mktemp -d)"
-    PRE_COMMIT="$TMPDIR/pre-commit"
-    PRE_PUSH="$TMPDIR/pre-push"
+    TEST_TEMP="$(mktemp -d)"
+    PRE_COMMIT="$TEST_TEMP/pre-commit"
+    PRE_PUSH="$TEST_TEMP/pre-push"
 
     awk '/^[a-zA-Z]/{s=($0=="pre-commit:")?"y":"n";next} s=="y"{print}' \
         "$CONFIG" > "$PRE_COMMIT"
@@ -16,7 +16,7 @@ setup() {
 }
 
 teardown() {
-    rm -rf "$TMPDIR"
+    rm -rf "$TEST_TEMP"
 }
 
 @test "lefthook-remote.yml exists" {
