@@ -16,3 +16,5 @@ All notable changes to this project are documented here.
   the unit tests exercise this repository's code, not the pinned copy.
 - Unit tests load bats libraries with `bats_load_library` and no longer
   reassign `TMPDIR`.
+- `SPEC.md` bug list: fix duplicate and unseparated item numbers that
+  failed `markdownlint-agentic`, and record the dropped-package bug.
