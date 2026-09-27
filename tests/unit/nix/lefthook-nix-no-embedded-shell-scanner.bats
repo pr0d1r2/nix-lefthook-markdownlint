@@ -1,14 +1,14 @@
 #!/usr/bin/env bats
 
 setup() {
-    load "${BATS_LIB_PATH}/bats-support/load.bash"
-    load "${BATS_LIB_PATH}/bats-assert/load.bash"
+    bats_load_library bats-support
+    bats_load_library bats-assert
 
-    TMPDIR="$(mktemp -d)"
+    TEST_TEMP="$(mktemp -d)"
 }
 
 teardown() {
-    rm -rf "$TMPDIR"
+    rm -rf "$TEST_TEMP"
 }
 
 @test "contains SCANNER assignment" {
@@ -24,8 +24,8 @@ teardown() {
 }
 
 @test "sets SCANNER variable after placeholder substitution" {
-    sed 's|@SCANNER_PATH@|/test/scanner.sh|' nix/lefthook-nix-no-embedded-shell-scanner.sh > "$TMPDIR/scanner.sh"
-    run bash -c 'source "$1"; echo "$SCANNER"' -- "$TMPDIR/scanner.sh"
+    sed 's|@SCANNER_PATH@|/test/scanner.sh|' nix/lefthook-nix-no-embedded-shell-scanner.sh > "$TEST_TEMP/scanner.sh"
+    run bash -c 'source "$1"; echo "$SCANNER"' -- "$TEST_TEMP/scanner.sh"
     assert_success
     assert_output "/test/scanner.sh"
 }

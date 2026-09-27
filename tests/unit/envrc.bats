@@ -1,16 +1,16 @@
 #!/usr/bin/env bats
 
 setup() {
-    load "${BATS_LIB_PATH}/bats-support/load.bash"
-    load "${BATS_LIB_PATH}/bats-assert/load.bash"
+    bats_load_library bats-support
+    bats_load_library bats-assert
 
-    TMPDIR="$(mktemp -d)"
-    WATCH_LOG="$TMPDIR/watch_log"
-    USE_LOG="$TMPDIR/use_log"
+    TEST_TEMP="$(mktemp -d)"
+    WATCH_LOG="$TEST_TEMP/watch_log"
+    USE_LOG="$TEST_TEMP/use_log"
 }
 
 teardown() {
-    rm -rf "$TMPDIR"
+    rm -rf "$TEST_TEMP"
 }
 
 @test "watches nix/direnv.sh for changes" {
