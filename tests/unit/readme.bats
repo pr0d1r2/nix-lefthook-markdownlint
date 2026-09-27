@@ -14,6 +14,8 @@ setup() {
 @test "discloses autonomous tending with a maintained disclaimer link" {
     run grep -F '<!-- hallucinogen:autonomy-disclaimer start -->' "$README"
     assert_success
+    run grep -F 'tended by an autonomous loop' "$README"
+    assert_success
     run grep -F '[LLM-DISCLAIMER](docs/LLM-DISCLAIMER.md)' "$README"
     assert_success
     run grep -F '<!-- hallucinogen:autonomy-disclaimer end -->' "$README"
