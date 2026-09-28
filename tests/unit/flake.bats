@@ -25,6 +25,12 @@ setup() {
   assert_output "lefthook-markdownlint"
 }
 
+@test "default package builds" {
+  run --separate-stderr nix --extra-experimental-features 'nix-command flakes' build \
+    "$REPO_ROOT#default" --no-link
+  assert_success
+}
+
 @test "flake exports the is-markdown-agentic package" {
   run --separate-stderr nix --extra-experimental-features 'nix-command flakes' eval --raw \
     "$REPO_ROOT#packages.$SYSTEM.is-markdown-agentic.meta.mainProgram"

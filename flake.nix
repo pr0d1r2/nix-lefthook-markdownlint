@@ -66,7 +66,10 @@
               name = "lefthook-markdownlint";
               runtimeInputs = [
                 pkgs.markdownlint-cli
-                self.packages.${pkgs.stdenv.hostPlatform.system}.is-markdown-agentic
+                (pkgs.writeShellApplication {
+                  name = "is-markdown-agentic";
+                  text = builtins.readFile ./is-markdown-agentic.sh;
+                })
               ];
               text = builtins.readFile ./lefthook-markdownlint.sh;
             };
